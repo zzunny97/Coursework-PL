@@ -1,6 +1,4 @@
-
 CC=g++
-
 CFLAGS=-g -Wall
 OBJS=ExtendableArray.o driver1.o 
 TARGET=test
