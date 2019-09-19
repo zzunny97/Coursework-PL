@@ -14,22 +14,49 @@ ElementRef::ElementRef(const ElementRef& other) {
 }
 
 ElementRef::~ElementRef() {
-
+	intArrayRef = NULL;
 }
 
 ElementRef& ElementRef::operator=(const ElementRef& rhs) {
+	// a[i+5] = b[i];
+	// memory realloc needed
+	if(index >= intArrayRef->size) {
+		int old_size = intArrayRef->size;
+		int new_size = index+1;
+		intArrayRef->arrayPointer = (int*)realloc(intArrayRef->arrayPointer, sizeof(int)*(new_size));
+				
+		for(int i=old_size; i<new_size; i++) {
+			intArrayRef->arrayPointer[i] = 0;
+		}
+		intArrayRef->size = new_size;
+	}
 	intArrayRef->arrayPointer[index] = rhs.intArrayRef->arrayPointer[rhs.index];
 	return *this;
 }
 
 ElementRef& ElementRef::operator=(int val) {
-	cout << "ref operator=" << endl;
+	// a[i] = i;
+	// memory realloc needed
+
+	if(index >= intArrayRef->size) {
+		int old_size = intArrayRef->size;
+		int new_size = index+1;
+		intArrayRef->arrayPointer = (int*)realloc(intArrayRef->arrayPointer, sizeof(int)*(new_size));
+				
+		for(int i=old_size; i<new_size; i++) {
+			intArrayRef->arrayPointer[i] = 0;
+		}
+		intArrayRef->size = new_size;
+	}
+
 	intArrayRef->arrayPointer[index] = val;
 	return *this;
 }
 
 ElementRef::operator int() const {
-	cout << "ref operator int()" << endl;
+	// cout << a[i] << endl;
+	// no memory realloc
+	if(index >= intArrayRef->size) return 0;	
 	return intArrayRef->arrayPointer[index];
 }
 
@@ -52,7 +79,7 @@ ExtendableArray::ExtendableArray(const ExtendableArray& other) {
 }
 
 ExtendableArray::~ExtendableArray() {
-
+	delete[] arrayPointer;
 }
 
 ExtendableArray& ExtendableArray::operator=(const ExtendableArray& rhs) {
@@ -67,15 +94,6 @@ ExtendableArray& ExtendableArray::operator=(const ExtendableArray& rhs) {
 
 
 ElementRef ExtendableArray::operator[](int i) {
-	if(i >= size) {
-		int old_size = size;
-		int new_size = i+1;
-		arrayPointer = (int*)realloc(arrayPointer, sizeof(int)*(new_size));
-		for(int i=old_size; i<new_size; i++) {
-			arrayPointer[i] = 0;
-		}
-		size = new_size;
-	}
 	ElementRef ret(*this, i);
 	return ret;	
 }
