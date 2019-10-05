@@ -1,0 +1,12 @@
+digit [0-9]
+letter [a-zA-Z]
+
+%%
+"hello world"					printf("good bye\n");
+{letter}({letter}|{digit})*		myprint(yytext);
+.								;
+%%
+void myprint(char* text) {
+	printf("a\n");
+	printf("%s\n", text);
+}
