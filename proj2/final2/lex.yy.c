@@ -671,7 +671,7 @@ YY_DECL
 		}
 
 	{
-#line 11 "cal.l"
+#line 12 "cal.l"
 
 #line 677 "lex.yy.c"
 
@@ -732,63 +732,63 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 12 "cal.l"
-{ printf("this is double %lf\n", atof(yytext)); yylval.dval = atof(yytext); return NUMBER; }
+#line 13 "cal.l"
+{ printf("this is number %lf\n", atof(yytext)); yylval.dval = atof(yytext); return NUMBER; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "cal.l"
+#line 14 "cal.l"
 { yylval.idx = find_idx(yytext); return VAR; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "cal.l"
-{ return ADD; }
+#line 15 "cal.l"
+{ return PLUS; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 15 "cal.l"
+#line 16 "cal.l"
 { return MULT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 16 "cal.l"
-{ return ADD; }
+#line 17 "cal.l"
+{ return MINUS; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 17 "cal.l"
-{ return MULT; }
+#line 18 "cal.l"
+{ return DIV; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 18 "cal.l"
-{ return EQUAL; }
+#line 19 "cal.l"
+{ return ASS; }
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 19 "cal.l"
+#line 20 "cal.l"
 { return EOL; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 20 "cal.l"
-{ return SEMI; }	
+#line 21 "cal.l"
+;	
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 21 "cal.l"
+#line 22 "cal.l"
 ;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 22 "cal.l"
+#line 23 "cal.l"
 { yyerror("unexpected char"); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 23 "cal.l"
+#line 24 "cal.l"
 ECHO;
 	YY_BREAK
 #line 795 "lex.yy.c"
@@ -1796,9 +1796,11 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 23 "cal.l"
+#line 24 "cal.l"
 
 
 
+
+//number [-]((([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+)))|((([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+)))|[+]((([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+)))
 
 

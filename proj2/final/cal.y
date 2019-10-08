@@ -20,36 +20,39 @@ int cur_idx;
 %token <idx> VAR 
 %token ADD MULT EOL EQUAL SEMI
 
-%type <dval> expr;
-%type <dval> assgn;
-%type <dval> term;
-%type <dval> factor;
+%type <dval> expr factor
 %%
+
 list : list stmt SEMI {}
-	 | stmt SEMI {}
-	 ;
+		 | stmt SEMI {}
+		 ;
 
 stmt : expr {}
-     | assgn {};
+     | assgn {  }
+		 ;
 
-assgn : EQUAL VAR stmt { reg[$2].vall = $3; };
+assgn : EQUAL VAR stmt { reg[$2].vall = $3; }
+			;
 
 expr : term { printf("=%lf\n", $1); }
-	 | ADD expr term { 
-	 	if($1=="+") $$ = $2 + $3;
-		else if($1=="-") $$ = $2 - $3;
-		else { printf("error\n"); }
-	 }
+		 | ADD expr term { 
+					if($1=="+") $$ = $2 + $3;
+					else if($1=="-") $$ = $2 - $3;
+					else { printf("error\n"); }
+				}
+		 ;
 term : factor {}
-	 | MULT term factor {
-	 	if($1=="*") $$ = $2 * $3;
-		else if($1=="/") $$ = $2 / $3;
-		else { printf("error\n"); }
-	 };
+	   | MULT term factor {
+				if($1=="*") $$ = $2 * $3;
+				else if($1=="/") $$ = $2 / $3;
+				else { printf("error\n"); }
+				}
+		 ;
 factor : VAR {$$ = reg[$1].vall; }
-	   | NUMBER { $$ = $1; }
-	   | '-' factor { $$ = -$1; } 
-	   | '(' expr ')' { $$ = $2; }
+			 | NUMBER { $$ = $1; }
+	     | '-' factor { $$ = -$2; } 
+	     | '(' expr ')' { $$ = $2; }
+			 ;
 
 
 
