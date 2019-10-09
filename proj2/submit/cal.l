@@ -13,10 +13,10 @@ variable [a-zA-Z]+
 {number}	{  yylval.dval = atof(yytext); return NUMBER; }
 {variable}  { yylval.idx = find_idx(yytext); return VAR; }
 "\n"			 { return EOL; }
-";"				 ;	
 "="				 { return ASS; }
 [ \t]+		 ;
-[-+*/]		 { return *yytext; }
+[;]				 { return SEMI; } 
+[-+*/!]		 { return *yytext; }
 .					{ yyerror("unexpected char"); }
 %%
 
