@@ -11,7 +11,7 @@ char **argv;
         yyin = fopen(argv[0], "r");
     }
     else {
-        yyerror("Usage: <cal.exe> <input file>");
+        yyerror("Usage: <proj2> <input file>");
         return -1;
     }
 

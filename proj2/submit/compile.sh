@@ -4,4 +4,4 @@ echo YACC
 bison -d cal.y
 echo GCC
 #gcc -o cal.exe cal.tab.c lex.yy.c main.c -ly
-gcc -o cal.exe cal.tab.c lex.yy.c main.c -ll
+gcc -o proj2 cal.tab.c lex.yy.c main.c -lfl
