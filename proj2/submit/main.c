@@ -1,11 +1,19 @@
 #include <stdio.h>
 
-int main(int argc, char* argv[]) {
-	/*
-	if(argc != 2) {
-		printf("Usage: [./a.out] [input file]\n");
-		return -1;
-	}*/
-	printf("Input file: %s\n", argv[1]);
+
+extern FILE *yyin;
+main(argc, argv)
+int argc;
+char **argv;
+{
+    ++argv, --argc;	
+    if(argc>0) {
+        yyin = fopen(argv[0], "r");
+    }
+    else {
+        yyerror("Usage: <cal.exe> <input file>");
+        return -1;
+    }
+
 	yyparse();
 }
