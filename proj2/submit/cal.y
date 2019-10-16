@@ -32,11 +32,11 @@
 
 %%
 goal : eval goal {} 
-		 | eval {} 
+		 | eval  {} 
 		 ;
-eval : expr  SEMI EOL { if($1 == INT_MIN) { printf("Unknown variable: %s\n", reg[tmp].name); } else printf("=%lf\n", $1); }
-		 | ASS VAR expr SEMI EOL { reg[$2].vall = $3; } 
-		 | ASS VAR ASS VAR expr SEMI EOL { reg[$4].vall = $5; reg[$2].vall = $5; }
+eval : expr SEMI { if($1 == INT_MIN) { printf("Unknown variable: %s\n", reg[tmp].name); } else printf("=%lf\n", $1); }
+		 | ASS VAR expr SEMI { reg[$2].vall = $3; } 
+		 | ASS VAR ASS VAR expr SEMI  { reg[$4].vall = $5; reg[$2].vall = $5; }
 		 ;
 expr : '+' expr expr { $$ = $2 + $3; }
 		 | '*' expr expr { $$ = $2 * $3; }
