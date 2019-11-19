@@ -51,7 +51,22 @@ int main() {
     cout << a3 << endl; // 1 0
 
     cout << a3[2147483647] << endl; // 0
+	
+	ExtendableArray b;
+	for(int i=1; i<=1000; i++) {
+		b[i] = i;
+	}
 
+	ExtendableArray b2;
+	for(int i=500; i<=1000; i++) {
+		b2[i] = b[i];
+	}
+	b2[0] = 1000;
+	cout << b << endl;
+	cout << b2 << endl;
+	cout << b[1001] << endl;
+	
+	
     return 0; 
 }
 
