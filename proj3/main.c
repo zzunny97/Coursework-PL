@@ -1,7 +1,12 @@
 #include <stdio.h>
 
-
 extern FILE *yyin;
+
+int main(void) {
+	yyparse();
+	return 0;
+}
+/*
 main(argc, argv)
 int argc;
 char **argv;
@@ -16,4 +21,4 @@ char **argv;
     }
 
 	yyparse();
-}
+}*/
