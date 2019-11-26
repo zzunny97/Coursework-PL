@@ -1,0 +1,1 @@
+./ginko < input.txt
