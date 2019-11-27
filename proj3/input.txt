@@ -1,4 +1,5 @@
 SET x to 10;
 SET y to 5;
 PRINT x;
-PRINT y;
+PRINT x;
+PRINT x;

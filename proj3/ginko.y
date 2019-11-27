@@ -7,12 +7,9 @@
 
 #define MAX 100
 
-	/*
-typedef struct varr {
-	double vall;
-	char* name;
-}varr;
-varr reg[MAX];*/
+char* vars[MAX];
+double vals[MAX];
+int numvars;
 double symbols[MAX];
 double exec(Node* n);
 
@@ -30,6 +27,8 @@ double exec(Node* n);
 %token <dval> NUMBER
 %token <idx> ID
 %token IF ELSE THEN FUNC PRINT WHILE DO ENDIF SET to ENDWHILE RETURN
+%token GREQ_SYM LESQ_SYM EQ_SYM NEQ_SYM
+
 
 %type <node_ptr> program func_decl stmt_list stmt assign_stmt print_stmt
 %type <node_ptr> if_stmt while_stmt func_call fstmt_list fstmt param_list ID_list
@@ -48,10 +47,15 @@ stmt : assign_stmt { $$ = $1;}
      | while_stmt {$$ = $1;}
      | func_call {$$ = $1;}
      ;
-assign_stmt : SET ID to expr ';' { $$ = new_node(2, SET_EXPR, 2, $2, $4); }
+assign_stmt : SET ID to expr ';' { 
+				  Node* id_node = new_node_var(1, VAR, $2);
+				  $$ = new_node(2, SET_EXPR, 2, id_node, $4); 
+			  }
             | SET ID to func_call ';' {}
             ;
-print_stmt : PRINT expr ';' { $$ = new_node(2, PRINTSTMT, 1, $2); }
+print_stmt : PRINT expr ';' { 
+				 //printf("yacc print\n"); 
+				 $$ = new_node(2, PRINTSTMT, 1, $2); }
            ;
 if_stmt : IF expr THEN stmt_list ENDIF { $$ = new_node(2, IFSTMT, 2, $2, $4); }
         | IF expr THEN stmt_list ELSE stmt_list ENDIF { $$ = new_node(2, IF, 3, $2, $4, $6);  }
@@ -84,18 +88,22 @@ expr_list : ',' expr expr_list {  }
 		  | /* epsilon */ {}
           ;
 expr : '(' expr ')'		{ $$ = new_node(2, PAR, 1, $2); }
-	 | '+' expr expr	{ $$ = new_node(2, PLUS, 2, $2, $3); }
+	 | '+' expr expr	{ 
+		 //printf("expr plus\n"); 
+		 $$ = new_node(2, PLUS, 2, $2, $3); }
      | '-' expr expr	{ $$ = new_node(2, MINUS, 2, $2, $3); }
      | '*' expr expr	{ $$ = new_node(2, MUL, 2, $2, $3);  }
      | '/' expr expr	{ $$ = new_node(2, DIV, 2, $2, $3);}
      | '<' expr expr	{ $$ = new_node(2, LES, 2, $2, $3); }	
      | '>' expr expr	{ $$ = new_node(2, GRE, 2, $2, $3); }
-     | "<=" expr expr	{ $$ = new_node(2, LESQ, 2, $2, $3); }
-     | ">=" expr expr	{ $$ = new_node(2, GREQ, 2, $2, $3); }
-     | "==" expr expr	{ $$ = new_node(2, EQ, 2, $2, $3); }
-     | "!=" expr expr	{ $$ = new_node(2, NEQ, 2, $2, $3); }
+     | LESQ_SYM expr expr	{ $$ = new_node(2, LESQ, 2, $2, $3); }
+     | GREQ_SYM expr expr	{ $$ = new_node(2, GREQ, 2, $2, $3); }
+     | EQ_SYM expr expr	{ $$ = new_node(2, EQ, 2, $2, $3); }
+     | NEQ_SYM expr expr	{ $$ = new_node(2, NEQ, 2, $2, $3); }
      | '!' expr			{ $$ = new_node(2, NEG, 1, $2); }
-     | NUMBER			{ $$ = new_node_num(0, NUM, $1); }
+     | NUMBER			{ 
+		 //printf("YACC NUMBER\n"); 
+		 $$ = new_node_num(0, NUM, $1); }
      | ID				{ $$ = new_node_var(1, VAR, $1); }
      ;
 %%
@@ -125,11 +133,21 @@ int yywrap() {
     return 0;
 }
 
+int findindex(char* var) {
+	for(int i=0; i<numvars; i++) {
+		if(strcmp(var, vars[i])==0)
+			return i;
+	}
+	vars[numvars] = strdup(var);
+	return numvars++;
+}
+
 double exec(Node* n) {
+	//printf("func: exec\n");
 	if(!n) return 0;
 	switch(n->type){
 		case 0: return n->val;
-		case 1: return symbols[n->var_idx];
+		case 1: return vals[n->var_idx];
 		case 2:
 			switch(n->op){
 				case PAR:	return exec(n->next[0]);
@@ -149,8 +167,11 @@ double exec(Node* n) {
 						exec(n->next[1]);
 					return 0;
 				case SET_EXPR:
-					printf("CASE SET_EXPR\n");
-					return symbols[n->next[0]->var_idx] = exec(n->next[1]);
+					//return symbols[n->next[0]->var_idx] = exec(n->next[1]);
+					return vals[n->next[0]->var_idx] = exec(n->next[1]);
+					//symbols[n->next[0]->var_idx] = exec(n->next[1]);
+					//return symbols[n->next[0]->var_idx];
+					
 				case PRINTSTMT:	printf("%lf\n", exec(n->next[0])); return 0;
 				case IFSTMT:
 					if(exec(n->next[0])) exec(n->next[1]);

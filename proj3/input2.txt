@@ -1,0 +1,12 @@
+SET p to 10;
+SET q to 20;
+PRINT p;
+PRINT q;
+PRINT + 2 3;
+PRINT + p q;
+WHILE <= p q DO
+	SET p to * p 2;
+ENDWHILE
+
+PRINT p;
+PRINT q;

@@ -8,7 +8,10 @@ number (([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+))
 variable [a-zA-Z]+
 
 %%
-"SET"		{ printf("LEX SET\n"); return SET; }
+"SET"		{ 
+	//printf("LEX SET\n"); 
+	return SET; 
+}
 "to"		{ return to; }
 "IF"		{ return IF;}
 "THEN"		{ return THEN; }
@@ -17,16 +20,54 @@ variable [a-zA-Z]+
 "FUNC"		{ return FUNC;}
 "RETURN"	{ return RETURN; }
 "ENDWHILE"	{ return ENDWHILE; } 
-"PRINT"		{ return PRINT; }
-"WHILE"		{ return WHILE; }
-"DO"		{ return DO; }
+"PRINT"		{ 
+	//printf("LEX PRINT\n"); 
+	return PRINT;
+}
+"WHILE"		{ 
+	printf("LEX WHILE\n"); 
+	return WHILE; 
+}
+"DO"		{ 
+	//printf("LEX DO\n");
+	return DO;
+}
+">="		{
+	printf("LEX >=\n");
+	return GREQ_SYM;
+}
 
+"<=" {
+	printf("LEX <=\n");
+	return LESQ_SYM;
+}
+"==" {
+	printf("LEX ==\n");
+	return EQ_SYM;
+}
+"!=" {
+	printf("LEX !=\n");
+	return NEQ_SYM;
+}
 
-
-{number}	{  printf("%lf\n", atof(yytext)); yylval.dval = atof(yytext); return NUMBER; }
-{variable}	{  printf("%s\n", yytext); yylval.idx = *yytext- 'a'; return ID; }
+{number}	{ 
+	//printf("LEX number: %lf\n", atof(yytext)); 
+	yylval.dval = atof(yytext); 
+	return NUMBER; 
+}
+{variable}	{ 
+	//printf("LEX var: %s var idx: %d\n", yytext, *yytext - 'a'); 
+	//yylval.idx = *yytext - 'a';  
+	yylval.idx = findindex(yytext);
+	return ID; 
+}
 [ \t\n]+	;
-[-+*/!]		{ return *yytext; }
+[-+*/!<>()]		{ 
+	printf("LEX symbol: %s\n", yytext); 
+	return *yytext; 
+}
 [;]			{ return *yytext; } 	
-.			;		
+.			{ 
+	printf("unknown variable %s\n", yytext); 
+}		
 %%

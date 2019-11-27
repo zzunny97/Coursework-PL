@@ -32,6 +32,7 @@ typedef struct Node {
 }Node;
 
 Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
+	//printf("Func: new_node\n");
 	va_list ap;
 	Node* ret = (Node*)malloc(sizeof(Node));
 	if(ret == NULL)
@@ -42,31 +43,35 @@ Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
 	for(int i=0; i<5; i++)
 		ret->next[i] = NULL;
 	va_start(ap, ret->op_cnt);
-
-
-	for(int i=0; i<ret->op_cnt; i++)
+	for(int i=0; i<ret->op_cnt; i++) {
 		ret->next[i] = va_arg(ap, Node*);
+	}
 	va_end(ap);
+	//printf("Func: new_node end\n");
 	return ret;
 }
 
 Node* new_node_num(int par_type, int par_op, double par_val) {
+	//printf("Func: new_node_num\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->val = par_val;
 	for(int i=0; i<5; i++)
 		ret->next[i] = NULL;
+	//printf("Func: new_node_num end\n");
 	return ret;
 }
 
 Node* new_node_var(int par_type, int par_op, int par_idx) {
+	//printf("Func: new_node_var\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->var_idx = par_idx;
 	for(int i=0; i<5; i++)
 		ret->next[i] = NULL;
+	//printf("Func: new_node_var end\n");
 	return ret;
 }
 

@@ -1,0 +1,10 @@
+SET a to 10;
+SET b to 20;
+IF ( > a b ) THEN
+	SET x to a;
+ELSE
+	SET x to b;
+ENDIF
+PRINT a;
+PRINT b;
+PRINT x;
