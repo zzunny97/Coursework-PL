@@ -17,15 +17,21 @@ variable [a-zA-Z]+
 "THEN"		{ return THEN; }
 "ENDIF"		{ return ENDIF; }
 "ELSE"		{ return ELSE;}
-"FUNC"		{ return FUNC;}
-"RETURN"	{ return RETURN; }
+"FUNC"		{ 
+	//printf("LEX FUNC\n");
+	return FUNC;
+}
+"RETURN"	{ 
+	//printf("LEX RETURN\n");
+	return RETURN;
+}
 "ENDWHILE"	{ return ENDWHILE; } 
 "PRINT"		{ 
 	//printf("LEX PRINT\n"); 
 	return PRINT;
 }
 "WHILE"		{ 
-	printf("LEX WHILE\n"); 
+	//printf("LEX WHILE\n"); 
 	return WHILE; 
 }
 "DO"		{ 
@@ -33,20 +39,20 @@ variable [a-zA-Z]+
 	return DO;
 }
 ">="		{
-	printf("LEX >=\n");
+	//printf("LEX >=\n");
 	return GREQ_SYM;
 }
 
 "<=" {
-	printf("LEX <=\n");
+	//printf("LEX <=\n");
 	return LESQ_SYM;
 }
 "==" {
-	printf("LEX ==\n");
+	//printf("LEX ==\n");
 	return EQ_SYM;
 }
 "!=" {
-	printf("LEX !=\n");
+	//printf("LEX !=\n");
 	return NEQ_SYM;
 }
 
@@ -56,14 +62,13 @@ variable [a-zA-Z]+
 	return NUMBER; 
 }
 {variable}	{ 
-	//printf("LEX var: %s var idx: %d\n", yytext, *yytext - 'a'); 
-	//yylval.idx = *yytext - 'a';  
 	yylval.idx = findindex(yytext);
+	//printf("LEX var: %s var idx: %d\n", yytext, yylval.idx); 
 	return ID; 
 }
 [ \t\n]+	;
-[-+*/!<>()]		{ 
-	printf("LEX symbol: %s\n", yytext); 
+[-+*/!<>(),{}]		{ 
+	//printf("LEX symbol: %s\n", yytext); 
 	return *yytext; 
 }
 [;]			{ return *yytext; } 	

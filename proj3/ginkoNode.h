@@ -3,7 +3,7 @@
 
 #ifndef __GINKONODE__
 #define __GINKONODE__
-#define PLUS 0		// '+'
+#define PLUS 0			// '+'
 #define MINUS 1		// '-'
 #define MUL 2		// '*'
 #define DIV 3		// '/'
@@ -21,6 +21,20 @@
 #define NEG 15		// negative !
 #define VAR 16
 #define NUM 17
+#define SET_FUNC_CALL 18
+#define FUNC_DECL 19
+#define FUNC_CALL 20
+#define FSTMT_LIST 21
+#define PARAM_LIST 22
+#define ID_LIST 23
+#define ARG_LIST 24
+#define EXPR_LIST 25
+#define FUNC_NAME 26
+#define ROOT 27
+#define STMT 28
+#define STMT_LIST 29
+#define PROGRAM 30
+
 
 typedef struct Node {
 	int type;
@@ -32,9 +46,13 @@ typedef struct Node {
 }Node;
 
 Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
-	//printf("Func: new_node\n");
+	printf("Func: new_node\n");
 	va_list ap;
 	Node* ret = (Node*)malloc(sizeof(Node));
+	if(ret == NULL) {
+		printf("malloc failed\n");
+		return NULL;
+	}
 	if(ret == NULL)
 		yyerror("malloc failed\n");
 	ret->type =	par_type;
@@ -47,7 +65,7 @@ Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
 		ret->next[i] = va_arg(ap, Node*);
 	}
 	va_end(ap);
-	//printf("Func: new_node end\n");
+	printf("Func: new_node end\n");
 	return ret;
 }
 
@@ -66,6 +84,10 @@ Node* new_node_num(int par_type, int par_op, double par_val) {
 Node* new_node_var(int par_type, int par_op, int par_idx) {
 	//printf("Func: new_node_var\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
+	if(ret == NULL) {
+		printf("malloc failed\n");
+		return NULL;
+	}
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->var_idx = par_idx;
@@ -74,5 +96,21 @@ Node* new_node_var(int par_type, int par_op, int par_idx) {
 	//printf("Func: new_node_var end\n");
 	return ret;
 }
+
+Node* new_node_func(int par_type, int par_op, int par_func_idx) {
+	Node* ret = (Node*)malloc(sizeof(Node));
+	if(ret == NULL) {
+		printf("malloc failed\n");
+		return NULL;
+	}
+	ret->type = par_type;
+	ret->op = par_op;
+	ret->var_idx = par_func_idx;
+	for(int i=0; i<5; i++)
+		ret->next[i] = NULL;
+	return ret;
+}
+
+
 
 #endif

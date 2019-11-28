@@ -1,1 +1,1 @@
-./ginko < input3.txt
+./ginko < input.txt
