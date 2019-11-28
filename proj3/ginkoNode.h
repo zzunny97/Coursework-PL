@@ -34,6 +34,8 @@
 #define STMT 28
 #define STMT_LIST 29
 #define PROGRAM 30
+#define FUNC_NAME_TMP 31
+#define EXPR_LIST_TMP 32
 
 
 typedef struct Node {
@@ -46,13 +48,8 @@ typedef struct Node {
 }Node;
 
 Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
-	printf("Func: new_node\n");
 	va_list ap;
 	Node* ret = (Node*)malloc(sizeof(Node));
-	if(ret == NULL) {
-		printf("malloc failed\n");
-		return NULL;
-	}
 	if(ret == NULL)
 		yyerror("malloc failed\n");
 	ret->type =	par_type;
@@ -65,13 +62,14 @@ Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
 		ret->next[i] = va_arg(ap, Node*);
 	}
 	va_end(ap);
-	printf("Func: new_node end\n");
 	return ret;
 }
 
 Node* new_node_num(int par_type, int par_op, double par_val) {
 	//printf("Func: new_node_num\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
+	if(ret == NULL)
+		yyerror("malloc failed\n");
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->val = par_val;
@@ -84,10 +82,8 @@ Node* new_node_num(int par_type, int par_op, double par_val) {
 Node* new_node_var(int par_type, int par_op, int par_idx) {
 	//printf("Func: new_node_var\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
-	if(ret == NULL) {
-		printf("malloc failed\n");
-		return NULL;
-	}
+	if(ret == NULL)
+		yyerror("malloc failed\n");
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->var_idx = par_idx;
@@ -98,16 +94,16 @@ Node* new_node_var(int par_type, int par_op, int par_idx) {
 }
 
 Node* new_node_func(int par_type, int par_op, int par_func_idx) {
+	//printf("new_node_func start\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
-	if(ret == NULL) {
-		printf("malloc failed\n");
-		return NULL;
-	}
+	if(ret == NULL)
+		yyerror("malloc failed\n");
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->var_idx = par_func_idx;
 	for(int i=0; i<5; i++)
 		ret->next[i] = NULL;
+	//printf("new_node_func end\n");
 	return ret;
 }
 

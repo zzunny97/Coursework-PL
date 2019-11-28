@@ -1,1 +1,1 @@
-./ginko < input.txt
+./ginko input_simple.gk

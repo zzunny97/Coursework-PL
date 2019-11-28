@@ -1,13 +1,12 @@
 #include <stdio.h>
 
 extern FILE *yyin;
-
+/*
 int main(void) {
 	yyparse();
 	return 0;
-}
-/*
-main(argc, argv)
+}*/
+/*main(argc, argv)
 int argc;
 char **argv;
 {
@@ -22,3 +21,18 @@ char **argv;
 
 	yyparse();
 }*/
+#include <stdio.h>
+#include <stdlib.h>
+extern FILE *yyin;
+extern int yyparse(void);
+int main(int argc, char* argv[]){
+	if(argc != 2) {
+		printf("no input!!\n");
+		exit(EXIT_FAILURE);
+	}
+	int data;
+	yyin = fopen(argv[1], "r");
+	yyparse();
+	fclose(yyin);
+	return 0;
+}
