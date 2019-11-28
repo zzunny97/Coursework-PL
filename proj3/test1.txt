@@ -11,7 +11,7 @@ SET q to 20;
 SET r to max(p,q);
 PRINT r;
 WHILE < p q DO
-SET p to * p 4;
+SET p to * p 2;
 ENDWHILE
 SET r to max(p,q);
 PRINT r;

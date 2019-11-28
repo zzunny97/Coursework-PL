@@ -17,6 +17,10 @@ Node* func_root;
 double stack[MAX];
 int head;
 int tail;
+int arg_cnt;
+int par_cnt;
+    
+extern int yylineno;
 %}
 
 %union { 
@@ -84,7 +88,7 @@ if_stmt : IF expr THEN stmt_list ENDIF { $$ = new_node(2, IFSTMT, 2, $2, $4); }
 while_stmt : WHILE expr DO stmt_list ENDWHILE { $$ = new_node(2, WHILE, 2, $2, $4); }
            ;
 func_decl : FUNC ID '(' param_list ')' '{' fstmt_list RETURN expr ';' '}' func_decl {
-				printf("func_decl1\n");
+				//printf("func_decl1\n");
 				Node* func_name = new_node_func(2, FUNC_NAME, $2);
 				//pushFunc(func_name);
 				//$$ = new_node(2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
@@ -93,7 +97,7 @@ func_decl : FUNC ID '(' param_list ')' '{' fstmt_list RETURN expr ';' '}' func_d
 				$$ = nn;
 			}
           | FUNC ID '(' param_list ')' '{' fstmt_list RETURN func_call ';' '}' func_decl {
-			  printf("func_decl2\n");
+			  //printf("func_decl2\n");
 			  Node* func_name = new_node_func(2, FUNC_NAME, $2);
 			  //pushFunc(func_name);
 			  //$$ = new_node(2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
@@ -127,7 +131,7 @@ ID_list : ',' ID ID_list {
 				Node* id_node = new_node_var(2,	FUNC_NAME_TMP, $2); 
 				$$ = new_node(2, ID_LIST, 2, id_node, $3);
 			}
-		| /* epsilon */ {}
+		| /* epsilon */ { $$ = new_node(3, EPSILON, 0); }
         ;
 func_call : ID '(' arg_list ')'  {
 				Node* id_node = new_node_var(2,	FUNC_NAME_TMP, $1); 
@@ -145,7 +149,7 @@ expr_list : ',' expr expr_list {
 				//$$ = new_node(2, EXPR_LIST, 2, $2, list_tmp);
 				$$ = new_node(2, EXPR_LIST, 2, $2, $3);
 			}
-		  | /* epsilon */ {}
+		  | /* epsilon */ { $$ = new_node(3, EPSILON, 0); }
           ;
 expr : '(' expr ')'		{ $$ = new_node(2, PAR, 1, $2); }
 	 | '+' expr expr	{ $$ = new_node(2, PLUS, 2, $2, $3); }
@@ -168,12 +172,17 @@ expr : '(' expr ')'		{ $$ = new_node(2, PAR, 1, $2); }
 
 yyerror(char* s) {
     extern char* yytext;
-    extern int yylineno;
-    fprintf(stdout, "%s\nLine No: %d\nAt char: %s\n", s, yylineno, yytext);
+    //extern int yylineno;
+	printf("Error: %d\n", yylineno);
+    //fprintf(stdout, "%s\nLine No: %d\nAt char: %s\n", s, yylineno, yytext);
 }
 
 
 int findindex(char* var) {
+	if(numvars == 0) {
+		for(int i=0; i<MAX; i++)
+			vals[i] = INT_MIN;
+	}
 	for(int i=0; i<numvars; i++) {
 		if(strcmp(var, vars[i])==0)
 			return i;
@@ -190,6 +199,7 @@ void pushFunc(struct Node* n) {
 
 
 double exec(Node* n) {
+	//printf("exec\n");
 	if(!n) {
 		printf("n is null return exec\n");
 		return 0;
@@ -198,13 +208,16 @@ double exec(Node* n) {
 		printf("n is null!!!\n");
 	switch(n->type){
 		case 0:
-			printf("Case0\n");
 			return n->val;
 		case 1: 
-			printf("Case1\n");
+			//printf("%s\n", vars[n->var_idx]);
+			//printf("%lf\n", vals[n->var_idx]);
+			if(vals[n->var_idx] == INT_MIN) {
+				printf("Unknown variable: %s\n", vars[n->var_idx]);
+				exit(-1);
+			}
 			return vals[n->var_idx];
 		case 2:
-			printf("Case2\n");
 			switch(n->op){
 				case PROGRAM: return exec(n->next[1]);
 				case PAR:
@@ -248,68 +261,87 @@ double exec(Node* n) {
 						exec(n->next[1]);
 					return 0;
 				case SET_EXPR:
-					//return vals[n->next[0]->var_idx] = exec(n->next[1]);
-					//vals[n->next[0]->var_idx] = exec(n->next[1]);
-					//printf("%lf\n", exec(n->next[1]));
-					printf("case SET_EXPR\n");
+					//printf("case SET_EXPR\n");
 					return vals[n->next[0]->var_idx] = exec(n->next[1]);
 				case SET_FUNC_CALL:
-					printf("case SET_FUNC_CALL\n");
+					//printf("case SET_FUNC_CALL\n");
 					return vals[n->next[0]->var_idx] = exec(n->next[1]);
 				case PRINTSTMT:	
-					printf("case PRINTSTMT\n");
-					printf("====== Real print: %lf\n", exec(n->next[0])); 
+					//printf("case PRINTSTMT\n");
+					printf("%lf\n", exec(n->next[0])); 
 
 					//printf("%lf\n", exec(n->next[0])); 
 					return 0;
 				case IFSTMT:
-					printf("case IFSTMT\n");
+					//printf("case IFSTMT\n");
 					if(exec(n->next[0])) return exec(n->next[1]);
 					else if(n->op_cnt == 3) return exec(n->next[2]);
 				case FUNC_CALL:
-					printf("case FUNC_CALL\n");
+					//printf("case FUNC_CALL\n");
 					exec(n->next[1]);	
 
 					for(int i=0; i<numfuncs; i++) {
 						if(n->next[0]->var_idx == funcs[i]->next[0]->var_idx) {
-							printf("executing function\n");
+							//printf("executing function\n");
 							return exec(funcs[i]);
 						}
 					}
 				case ARG_LIST:
-					printf("case ARG_LIST how many args: %d\n", n->op_cnt);
-					printf("case ARG_LIST exec0: %lf\n", exec(n->next[0]));	// expr
-					printf("case ARG_LIST exec1: %lf\n", exec(n->next[1]->next[0]));	// expr
+					//printf("case ARG_LIST how many args: %d\n", n->op_cnt);
+					arg_cnt = 0;
+					Node* ccur = n;
+					while(ccur->next[1] != NULL) {
+						arg_cnt++;
+						ccur = ccur->next[1];
+						if(ccur == NULL)
+							break;
+					}
+					//printf("arg_cnt: %d\n", arg_cnt);
+					//printf("case ARG_LIST exec0: %lf\n", exec(n->next[0]));	// expr
+					//printf("case ARG_LIST exec1: %lf\n", exec(n->next[1]->next[0]));	// expr
+					printf("");
 					//printf("case ARG_LIST exec1: %lf\n", exec(n->next[1]->next[1]));	// expr
 					Node* cur = n;
 					Node* prev;
-					for(int i=0; i<n->op_cnt; i++) {
+					//for(int i=0; i<n->op_cnt; i++) {
+					for(int i=0; i<arg_cnt; i++) {
 						prev = cur;
 						cur = prev->next[0];
 						stack[tail++] = exec(cur);
-						printf("enqueue %lf, tail %d\n", stack[tail-1], tail-1);
+						//printf("enqueue %lf, tail %d\n", stack[tail-1], tail-1);
 						cur = prev->next[1];
 
 					}
-					printf("end while\n");
+					//printf("end while\n");
 					return;
 				case PARAM_LIST:
-					printf("case PARAM_LIST how many pars: %d\n", n->op_cnt);
-					printf("%s\n", vars[n->next[0]->var_idx]);
-					printf("%s\n", vars[n->next[1]->next[0]->var_idx]);
+					//printf("case PARAM_LIST how many pars: %d\n", n->op_cnt);
+					par_cnt = 0;
+					Node* ccur2 = n;
+					exec(n->next[1]);
+					
+					while(ccur2->next[1] != NULL) {
+						par_cnt++;
+						ccur2 = ccur2->next[1];
+					}
+					//printf("par_cnt: %d\n", par_cnt);
+					if(par_cnt != arg_cnt){
+						printf("Error: %d\n", yylineno);
+					}
+					//printf("%s\n", vars[n->next[0]->var_idx]);
+					//printf("%s\n", vars[n->next[1]->next[0]->var_idx]);
+					printf("");
 					
 					Node* cur2 = n;
 					Node* prev2;
-					for(int i=0; i<n->op_cnt; i++) {
+					//for(int i=0; i<n->op_cnt; i++) {
+					for(int i=0; i<par_cnt; i++) {
 						prev2 = cur2;
 						cur2 = prev2->next[0];
 						vals[cur2->var_idx] = stack[head++];	
-						printf("dequeue %lf, head %d\n", stack[head-1], head - 1);
+						//printf("dequeue %lf, head %d\n", stack[head-1], head - 1);
 						cur2 = prev2->next[1];
 					}
-					
-
-					
 				case STMT:
 					return exec(n->next[0]);
 				case STMT_LIST:
@@ -317,7 +349,7 @@ double exec(Node* n) {
 					exec(n->next[1]);
 					return 0;
 				case FUNC_DECL:
-					printf("case FUNC_DECL\n");
+					//printf("case FUNC_DECL\n");
 					exec(n->next[1]); // param_list
 					exec(n->next[2]); // fstmt_list
 					return exec(n->next[3]);
@@ -325,9 +357,12 @@ double exec(Node* n) {
 					exec(n->next[0]);
 					exec(n->next[1]);
 				case ID_LIST:
-					printf("case ID_LIST\n");
+					//printf("case ID_LIST");
+					printf("");
+					//printf("case ID_LIST\n");
 				case EXPR_LIST:
-					printf("case EXPR_LIST\n");
+					printf("");
+					//printf("case EXPR_LIST\n");
 					//exec(n->next[0]);		// expr
 					//printf("case EXPR_LIST-1\n");
 					//printf("%d\n", n->next[1]);

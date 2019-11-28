@@ -36,6 +36,7 @@
 #define PROGRAM 30
 #define FUNC_NAME_TMP 31
 #define EXPR_LIST_TMP 32
+#define EPSILON 33
 
 
 typedef struct Node {
