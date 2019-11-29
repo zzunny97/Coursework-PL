@@ -1,0 +1,10 @@
+FUNC sum(a, b){
+	SET x to + b a;
+	RETURN x;
+}
+FUNC sum(a, b, c) {
+	SET x to + a b;
+	RETURN x;
+}
+SET s to ssum(1, 2, 3);
+PRINT s;

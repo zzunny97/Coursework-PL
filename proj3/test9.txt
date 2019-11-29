@@ -1,0 +1,17 @@
+FUNC max(ax, bx) {
+	IF ( > ax bx ) THEN
+		SET xx to ax ;
+	ELSE
+		SET xx to bx ;
+	ENDIF
+		RETURN xx;
+}
+SET px to 10;
+SET qx to 20;
+SET rx to max(px,qx);
+PRINT rx;
+WHILE < px qx DO
+SET px to * px 2;
+ENDWHILE
+SET rx to max(px,qx);
+PRINT rx;

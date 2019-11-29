@@ -1,5 +1,6 @@
 FUNC sum(a, b, c){
 	SET x to + b c;
+	SET x to + x a;
 	RETURN x;
 }
 SET s to sum(1, 2, 3);

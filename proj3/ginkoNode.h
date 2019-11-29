@@ -40,6 +40,7 @@
 
 
 typedef struct Node {
+	int line_num;
 	int type;
 	int op;
 	int op_cnt;
@@ -48,11 +49,12 @@ typedef struct Node {
 	struct Node* next[5];
 }Node;
 
-Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
+Node* new_node(int line_number, int par_type, int par_op, int par_op_cnt, ...){
 	va_list ap;
 	Node* ret = (Node*)malloc(sizeof(Node));
 	if(ret == NULL)
 		yyerror("malloc failed\n");
+	ret->line_num = line_number;
 	ret->type =	par_type;
 	ret->op = par_op;
 	ret->op_cnt = par_op_cnt;
@@ -66,11 +68,12 @@ Node* new_node(int par_type, int par_op, int par_op_cnt, ...){
 	return ret;
 }
 
-Node* new_node_num(int par_type, int par_op, double par_val) {
+Node* new_node_num(int line_number, int par_type, int par_op, double par_val) {
 	//printf("Func: new_node_num\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
 	if(ret == NULL)
 		yyerror("malloc failed\n");
+	ret->line_num = line_number;
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->val = par_val;
@@ -80,11 +83,12 @@ Node* new_node_num(int par_type, int par_op, double par_val) {
 	return ret;
 }
 
-Node* new_node_var(int par_type, int par_op, int par_idx) {
+Node* new_node_var(int line_number, int par_type, int par_op, int par_idx) {
 	//printf("Func: new_node_var\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
 	if(ret == NULL)
 		yyerror("malloc failed\n");
+	ret->line_num = line_number;
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->var_idx = par_idx;
@@ -94,11 +98,12 @@ Node* new_node_var(int par_type, int par_op, int par_idx) {
 	return ret;
 }
 
-Node* new_node_func(int par_type, int par_op, int par_func_idx) {
+Node* new_node_func(int line_number, int par_type, int par_op, int par_func_idx) {
 	//printf("new_node_func start\n");
 	Node* ret = (Node*)malloc(sizeof(Node));
 	if(ret == NULL)
 		yyerror("malloc failed\n");
+	ret->line_num = line_number;
 	ret->type = par_type;
 	ret->op = par_op;
 	ret->var_idx = par_func_idx;

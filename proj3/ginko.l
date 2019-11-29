@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ginko.tab.h"
+extern int cur_line;
 %}
 
 number (([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+))
@@ -66,7 +67,8 @@ variable [a-zA-Z]+
 	//printf("LEX var: %s var idx: %d\n", yytext, yylval.idx); 
 	return ID; 
 }
-[ \t\n]+	;
+[ \t]+	;
+[\n]	{ cur_line++;  }
 [-+*/!<>(),{}]		{ 
 	//printf("LEX symbol: %s\n", yytext); 
 	return *yytext; 

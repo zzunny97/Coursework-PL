@@ -19,6 +19,7 @@ int head;
 int tail;
 int arg_cnt;
 int par_cnt;
+int cur_line = 1;
     
 extern int yylineno;
 %}
@@ -48,7 +49,7 @@ program : func_decl stmt_list {
 		}
 stmt_list : stmt_list stmt { 
 				//printf("stmt_list1\n");
-				$$ = new_node(2, STMT_LIST, 2, $1, $2); 
+				$$ = new_node(cur_line, 2, STMT_LIST, 2, $1, $2); 
 			}
 		  | stmt { 
 			  //printf("stmt_list2\n");
@@ -68,40 +69,39 @@ stmt : assign_stmt {
      ;
 assign_stmt : SET ID to expr ';' { 
 				 //printf("assign_stmt: SET %s to %lf\n", vars[$2], $4);
-				 Node* id_node = new_node_var(1, VAR, $2);
-				 $$ = new_node(2, SET_EXPR, 2, id_node, $4); 
+				 Node* id_node = new_node_var(cur_line, 1, VAR, $2);
+				 $$ = new_node(cur_line, 2, SET_EXPR, 2, id_node, $4); 
 			  }
             | SET ID to func_call ';' {
 				//printf("SET\n");
-				Node* id_node = new_node_var(1, VAR, $2);
-				$$ = new_node(2, SET_FUNC_CALL, 2, id_node, $4);
+				Node* id_node = new_node_var(cur_line, 1, VAR, $2);
+				$$ = new_node(cur_line, 2, SET_FUNC_CALL, 2, id_node, $4);
 			}
             ;
 print_stmt : PRINT expr ';' { 
 				 //printf("print_stmt\n");
 				 //printf("yacc print\n"); 
-				 $$ = new_node(2, PRINTSTMT, 1, $2); }
+				 $$ = new_node(cur_line, 2, PRINTSTMT, 1, $2); }
            ;
-if_stmt : IF expr THEN stmt_list ENDIF { $$ = new_node(2, IFSTMT, 2, $2, $4); }
-        | IF expr THEN stmt_list ELSE stmt_list ENDIF { $$ = new_node(2, IFSTMT, 3, $2, $4, $6);  }
+if_stmt : IF expr THEN stmt_list ENDIF { $$ = new_node(cur_line, 2, IFSTMT, 2, $2, $4); }
+        | IF expr THEN stmt_list ELSE stmt_list ENDIF { $$ = new_node(cur_line, 2, IFSTMT, 3, $2, $4, $6);  }
         ;
-while_stmt : WHILE expr DO stmt_list ENDWHILE { $$ = new_node(2, WHILE, 2, $2, $4); }
+while_stmt : WHILE expr DO stmt_list ENDWHILE { $$ = new_node(cur_line, 2, WHILE, 2, $2, $4); }
            ;
 func_decl : FUNC ID '(' param_list ')' '{' fstmt_list RETURN expr ';' '}' func_decl {
-				//printf("func_decl1\n");
-				Node* func_name = new_node_func(2, FUNC_NAME, $2);
+				Node* func_name = new_node_func(cur_line, 2, FUNC_NAME, $2);
 				//pushFunc(func_name);
 				//$$ = new_node(2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
-				Node* nn = new_node(2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
+				Node* nn = new_node(cur_line, 2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
 				pushFunc(nn);
 				$$ = nn;
 			}
           | FUNC ID '(' param_list ')' '{' fstmt_list RETURN func_call ';' '}' func_decl {
 			  //printf("func_decl2\n");
-			  Node* func_name = new_node_func(2, FUNC_NAME, $2);
+			  Node* func_name = new_node_func(cur_line, 2, FUNC_NAME, $2);
 			  //pushFunc(func_name);
 			  //$$ = new_node(2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
-			  Node* nn = new_node(2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
+			  Node* nn = new_node(cur_line, 2, FUNC_DECL, 5, func_name, $4, $7, $9, $12);
 			  pushFunc(nn);
 			  $$ = nn;
 		  }
@@ -109,7 +109,7 @@ func_decl : FUNC ID '(' param_list ')' '{' fstmt_list RETURN expr ';' '}' func_d
 		  }
           ;
 fstmt_list : fstmt_list fstmt {
-				$$ = new_node(2, FSTMT_LIST, 2, $1, $2);
+				$$ = new_node(cur_line, 2, FSTMT_LIST, 2, $1, $2);
 			}
            | fstmt {
 			   	//$$ = new_node(2, FSTMT_LIST, 1, $1);
@@ -123,58 +123,58 @@ fstmt : assign_stmt { $$ = $1; }
       ;
 
 param_list : ID ID_list {
-				Node* id_node = new_node_var(2,	FUNC_NAME_TMP, $1); 
-				$$ = new_node(2, PARAM_LIST, 2, id_node, $2);
+				Node* id_node = new_node_var(cur_line, 2,	FUNC_NAME_TMP, $1); 
+				$$ = new_node(cur_line, 2, PARAM_LIST, 2, id_node, $2);
 			 }
            ;
 ID_list : ',' ID ID_list {
-				Node* id_node = new_node_var(2,	FUNC_NAME_TMP, $2); 
-				$$ = new_node(2, ID_LIST, 2, id_node, $3);
+				Node* id_node = new_node_var(cur_line, 2,	FUNC_NAME_TMP, $2); 
+				$$ = new_node(cur_line, 2, ID_LIST, 2, id_node, $3);
 			}
-		| /* epsilon */ { $$ = new_node(3, EPSILON, 0); }
+		| /* epsilon */ { $$ = new_node(cur_line, 3, EPSILON, 0); }
         ;
 func_call : ID '(' arg_list ')'  {
-				Node* id_node = new_node_var(2,	FUNC_NAME_TMP, $1); 
-				$$ = new_node(2, FUNC_CALL, 2, id_node, $3);
+				Node* id_node = new_node_var(cur_line, 2,	FUNC_NAME_TMP, $1); 
+				$$ = new_node(cur_line, 2, FUNC_CALL, 2, id_node, $3);
 			}
           ;
 arg_list : expr expr_list {
 			    //Node* list_tmp = new_node(2, EXPR_LIST_TMP, 1, $2);
 				//$$ = new_node(2, ARG_LIST, 2, $1, list_tmp);
-				$$ = new_node(2, ARG_LIST, 2, $1, $2);
+				$$ = new_node(cur_line, 2, ARG_LIST, 2, $1, $2);
 		   }
          ;
 expr_list : ',' expr expr_list { 
 				//Node* list_tmp = new_node(2, EXPR_LIST_TMP, 1, $3);
 				//$$ = new_node(2, EXPR_LIST, 2, $2, list_tmp);
-				$$ = new_node(2, EXPR_LIST, 2, $2, $3);
+				$$ = new_node(cur_line, 2, EXPR_LIST, 2, $2, $3);
 			}
-		  | /* epsilon */ { $$ = new_node(3, EPSILON, 0); }
+		  | /* epsilon */ { $$ = new_node(cur_line, 3, EPSILON, 0); }
           ;
-expr : '(' expr ')'		{ $$ = new_node(2, PAR, 1, $2); }
-	 | '+' expr expr	{ $$ = new_node(2, PLUS, 2, $2, $3); }
-     | '-' expr expr	{ $$ = new_node(2, MINUS, 2, $2, $3); }
-     | '*' expr expr	{ $$ = new_node(2, MUL, 2, $2, $3);  }
-     | '/' expr expr	{ $$ = new_node(2, DIV, 2, $2, $3);}
-     | '<' expr expr	{ $$ = new_node(2, LES, 2, $2, $3); }	
-     | '>' expr expr	{ $$ = new_node(2, GRE, 2, $2, $3); }
-     | LESQ_SYM expr expr	{ $$ = new_node(2, LESQ, 2, $2, $3); }
-     | GREQ_SYM expr expr	{ $$ = new_node(2, GREQ, 2, $2, $3); }
-     | EQ_SYM expr expr	{ $$ = new_node(2, EQ, 2, $2, $3); }
-     | NEQ_SYM expr expr	{ $$ = new_node(2, NEQ, 2, $2, $3); }
-     | '!' expr			{ $$ = new_node(2, NEG, 1, $2); }
-     | NUMBER			{ $$ = new_node_num(0, NUM, $1); }
+expr : '(' expr ')'		{ $$ = new_node(cur_line, 2, PAR, 1, $2); }
+	 | '+' expr expr	{ $$ = new_node(cur_line, 2, PLUS, 2, $2, $3); }
+     | '-' expr expr	{ $$ = new_node(cur_line, 2, MINUS, 2, $2, $3); }
+     | '*' expr expr	{ $$ = new_node(cur_line, 2, MUL, 2, $2, $3);  }
+     | '/' expr expr	{ $$ = new_node(cur_line, 2, DIV, 2, $2, $3);}
+     | '<' expr expr	{ $$ = new_node(cur_line, 2, LES, 2, $2, $3); }	
+     | '>' expr expr	{ $$ = new_node(cur_line, 2, GRE, 2, $2, $3); }
+     | LESQ_SYM expr expr	{ $$ = new_node(cur_line, 2, LESQ, 2, $2, $3); }
+     | GREQ_SYM expr expr	{ $$ = new_node(cur_line, 2, GREQ, 2, $2, $3); }
+     | EQ_SYM expr expr	{ $$ = new_node(cur_line, 2, EQ, 2, $2, $3); }
+     | NEQ_SYM expr expr	{ $$ = new_node(cur_line, 2, NEQ, 2, $2, $3); }
+     | '!' expr			{ $$ = new_node(cur_line, 2, NEG, 1, $2); }
+     | NUMBER			{ $$ = new_node_num(cur_line, 0, NUM, $1); }
      | ID				{ 
 		 //printf("expr ID\n");
-		 $$ = new_node_var(1, VAR, $1); }
+		 $$ = new_node_var(cur_line, 1, VAR, $1); }
      ;
 %%
 
-yyerror(char* s) {
+yyerror(char* s, int line_num) {
     extern char* yytext;
-    //extern int yylineno;
+    //extern int cur_line;
 	printf("Error: %d\n", yylineno);
-    //fprintf(stdout, "%s\nLine No: %d\nAt char: %s\n", s, yylineno, yytext);
+    //fprintf(stdout, "%s\nLine No: %d\nAt char: %s\n", s, cur_line, yytext);
 }
 
 
@@ -326,7 +326,8 @@ double exec(Node* n) {
 					}
 					//printf("par_cnt: %d\n", par_cnt);
 					if(par_cnt != arg_cnt){
-						printf("Error: %d\n", yylineno);
+						printf("Error: %d\n", n->line_num);
+						exit(-1);
 					}
 					//printf("%s\n", vars[n->next[0]->var_idx]);
 					//printf("%s\n", vars[n->next[1]->next[0]->var_idx]);
@@ -334,7 +335,28 @@ double exec(Node* n) {
 					
 					Node* cur2 = n;
 					Node* prev2;
-					//for(int i=0; i<n->op_cnt; i++) {
+					char** str = (char**)malloc(sizeof(char*)*par_cnt);
+					for(int i=0; i<par_cnt; i++) {
+						str[i] = (char*)malloc(sizeof(char)*10);
+						memset(str[i], 0, 10);
+					}
+
+					for(int i=0; i<par_cnt; i++) {
+						prev2 = cur2;
+						cur2 = prev2->next[0];
+						str[i] = strdup(vars[cur2->var_idx]);
+						cur2 = prev2->next[1];
+					}
+					for(int i=0; i<par_cnt; i++) {
+						for(int j=i+1; j<par_cnt; j++) {
+							if(strcmp(str[i], str[j]) == 0) {
+								printf("Error: %d\n", n->line_num);
+								exit(-1);
+							}
+						}
+					}
+
+					cur2 = n;
 					for(int i=0; i<par_cnt; i++) {
 						prev2 = cur2;
 						cur2 = prev2->next[0];
