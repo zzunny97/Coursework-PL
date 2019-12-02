@@ -1,7 +1,8 @@
 #/bin/bash
 
 [ $# -eq 0 ] && { 
-	echo "Usage: $0 MAXPOINTS";
+	com=`history | tail -n 1 | awk '{print $4}'`
+	echo "Usage: $com MAXPOINTS";
 	exit 1;
 }
 
@@ -24,8 +25,8 @@ do
 
 	diff -bwi $id".output" output.txt > $id".diff"
 	
-	diffcnt=`grep -o '>' $id."diff" | wc -w`
-	diffcnt2=`grep -o '<' $id."diff" | wc -w`
+	diffcnt=`grep -rn '>' $id."diff" | wc -l`
+	diffcnt2=`grep -rn '<' $id."diff" | wc -l`
 	((diffcnt_total="${diffcnt}"+$diffcnt2))
 	((curpoint="${curpoint}"-$diffcnt_total))
 	if [ ${curpoint} -lt 0 ]; then
