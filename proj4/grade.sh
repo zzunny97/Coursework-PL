@@ -24,11 +24,13 @@ do
 
 	diff -bwi $id".output" output.txt > $id".diff"
 	
-	diffcnt=`grep -rn '>' $id."diff" | wc -l`
-	diffcnt2=`grep -rn '<' $id."diff" | wc -l`
-#echo diffcnt=$diffcnt
+	diffcnt=`grep -o '>' $id."diff" | wc -w`
+	diffcnt2=`grep -o '<' $id."diff" | wc -w`
 	((diffcnt_total="${diffcnt}"+$diffcnt2))
-	((curpoint="${curpoint}"-$diffcnt_total))	
+	((curpoint="${curpoint}"-$diffcnt_total))
+	if [ ${curpoint} -lt 0 ]; then
+		((curpoint=0))
+	fi
 	if [ ${diffcnt} -eq 0 ]; then
 		echo $i has correct output
 		echo $i has $comments lines with comments
