@@ -45,5 +45,3 @@ do
 done
 
 ./clear.sh
-
-
